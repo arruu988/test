@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Tracker - Secure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 100%);
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 40px 30px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: white;
+            font-size: 22px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .config-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .config-title {
+            color: #a78bfa;
+            font-size: 14px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            color: #cbd5e1;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 13px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        input:focus {
+            border-color: #8b5cf6;
+        }
+
+        input::placeholder {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .status {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #10b981;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            color: #cbd5e1;
+            font-size: 14px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .info-label {
+            color: #94a3b8;
+        }
+
+        .info-value {
+            color: white;
+            font-weight: 500;
+            word-break: break-all;
+            max-width: 200px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 15px;
+            color: #10b981;
+            font-size: 14px;
+            min-height: 20px;
+        }
+
+        .error {
+            color: #ef4444;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #60a5fa;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .coords-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            color: #a78bfa;
+            font-size: 15px;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+
+        .map-link {
+            color: #60a5fa;
+            text-decoration: none;
+            font-size: 13px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .config-status {
+            color: #10b981;
+            font-size: 12px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🔐</div>
+        <h2>Secure Location Tracker</h2>
+        <p class="subtitle">Your token stays in browser only</p>
+
+        <!-- Configuration Section - No hardcoded tokens! -->
+        <div class="config-section" id="configSection">
+            <div class="config-title">⚙️ Bot Configuration</div>
+            
+            <div class="input-group">
+                <label>🤖 Bot Token</label>
+                <input type="password" id="botTokenInput" placeholder="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz" value="">
+            </div>
+            
+            <div class="input-group">
+                <label>💬 Chat ID</label>
+                <input type="text" id="chatIdInput" placeholder="1234567890" value="">
+            </div>
+            
+            <button class="save-btn" onclick="saveConfig()">💾 Save Configuration</button>
+            <div id="configStatus" class="config-status"></div>
+        </div>
+
+        <!-- Main Tracker UI (hidden until config saved) -->
+        <div id="trackerSection" class="hidden">
+            <div class="status" id="statusBox">
+                <div class="info-row">
+                    <span class="info-label">IP Address:</span>
+                    <span class="info-value" id="ipDisplay">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Time:</span>
+                    <span class="info-value" id="timeDisplay">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Status:</span>
+                    <span class="info-value" id="statusText">Ready</span>
+                </div>
+            </div>
+
+            <div id="locationDetails" style="display: none;">
+                <div class="coords-box" id="coordsDisplay"></div>
+                <a href="#" id="mapLink" target="_blank" class="map-link">🗺️ View on Google Maps</a>
+            </div>
+
+            <button class="btn" id="getLocationBtn" onclick="getLocationAndSend()">
+                📡 Get & Send Location
+            </button>
+
+            <div id="messageBox" class="message"></div>
+            
+            <button class="save-btn" onclick="resetConfig()" style="margin-top: 15px; background: linear-gradient(135deg, #64748b, #475569);">
+                🔄 Change Configuration
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Variables to store config in memory (not in code!)
+        let BOT_TOKEN = '';
+        let CHAT_ID = '';
+        let currentLocation = null;
+        let ipData = null;
+
+        // Check if config already saved in sessionStorage
+        window.onload = function() {
+            const savedToken = sessionStorage.getItem('botToken');
+            const savedChatId = sessionStorage.getItem('chatId');
+            
+            if (savedToken && savedChatId) {
+                BOT_TOKEN = savedToken;
+                CHAT_ID = savedChatId;
+                showTracker();
+                fetchIP();
+                updateTime();
+            } else {
+                // Pre-fill from URL parameters if any (optional)
+                const urlParams = new URLSearchParams(window.location.search);
+                const tokenParam = urlParams.get('token');
+                const chatParam = urlParams.get('chat');
+                
+                if (tokenParam) document.getElementById('botTokenInput').value = tokenParam;
+                if (chatParam) document.getElementById('chatIdInput').value = chatParam;
+            }
+        };
+
+        function saveConfig() {
+            const tokenInput = document.getElementById('botTokenInput').value.trim();
+            const chatInput = document.getElementById('chatIdInput').value.trim();
+            const statusEl = document.getElementById('configStatus');
+            
+            if (!tokenInput || !chatInput) {
+                statusEl.textContent = '❌ Please enter both Token and Chat ID';
+                statusEl.style.color = '#ef4444';
+                return;
+            }
+            
+            if (!tokenInput.includes(':')) {
+                statusEl.textContent = '❌ Invalid token format';
+                statusEl.style.color = '#ef4444';
+                return;
+            }
+            
+            // Save to memory and sessionStorage
+            BOT_TOKEN = tokenInput;
+            CHAT_ID = chatInput;
+            sessionStorage.setItem('botToken', tokenInput);
+            sessionStorage.setItem('chatId', chatInput);
+            
+            statusEl.textContent = '✅ Configuration saved!';
+            statusEl.style.color = '#10b981';
+            
+            setTimeout(() => {
+                showTracker();
+                fetchIP();
+                updateTime();
+            }, 500);
+        }
+
+        function showTracker() {
+            document.getElementById('configSection').classList.add('hidden');
+            document.getElementById('trackerSection').classList.remove('hidden');
+        }
+
+        function resetConfig() {
+            sessionStorage.removeItem('botToken');
+            sessionStorage.removeItem('chatId');
+            BOT_TOKEN = '';
+            CHAT_ID = '';
+            
+            document.getElementById('trackerSection').classList.add('hidden');
+            document.getElementById('configSection').classList.remove('hidden');
+            document.getElementById('botTokenInput').value = '';
+            document.getElementById('chatIdInput').value = '';
+            document.getElementById('configStatus').textContent = '';
+        }
+
+        // Current time update
+        function updateTime() {
+            const now = new Date();
+            const formatted = now.toLocaleString('en-IN', { 
+                timeZone: 'Asia/Kolkata',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            document.getElementById('timeDisplay').textContent = formatted;
+        }
+
+        // IP Address fetch
+        async function fetchIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                ipData = data.ip;
+                document.getElementById('ipDisplay').textContent = data.ip;
+            } catch (error) {
+                document.getElementById('ipDisplay').textContent = 'Unable to fetch';
+            }
+        }
+
+        // Main function - location lo aur bhejo
+        function getLocationAndSend() {
+            const btn = document.getElementById('getLocationBtn');
+            const statusEl = document.getElementById('statusText');
+            const msgBox = document.getElementById('messageBox');
+
+            if (!BOT_TOKEN || !CHAT_ID) {
+                showError('Configuration missing! Please reset and add token.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Getting location...';
+            statusEl.textContent = 'Requesting...';
+            msgBox.textContent = '';
+            msgBox.className = 'message';
+
+            if (!navigator.geolocation) {
+                showError('Geolocation not supported');
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    currentLocation = {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        accuracy: position.coords.accuracy
+                    };
+
+                    displayLocation(currentLocation);
+                    sendToTelegram(currentLocation);
+                    
+                    statusEl.textContent = 'Location acquired ✓';
+                    btn.innerHTML = '📍 Send Again';
+                    btn.disabled = false;
+                },
+                (error) => {
+                    btn.disabled = false;
+                    btn.innerHTML = '🔁 Try Again';
+                    statusEl.textContent = 'Failed';
+                    
+                    let errorMsg = '';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMsg = 'Permission denied';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMsg = 'Location unavailable';
+                            break;
+                        case error.TIMEOUT:
+                            errorMsg = 'Request timeout';
+                            break;
+                        default:
+                            errorMsg = 'Unknown error';
+                    }
+                    showError(errorMsg);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        function displayLocation(loc) {
+            const detailsDiv = document.getElementById('locationDetails');
+            const coordsDisplay = document.getElementById('coordsDisplay');
+            const mapLink = document.getElementById('mapLink');
+
+            const latFixed = loc.latitude.toFixed(7);
+            const lngFixed = loc.longitude.toFixed(7);
+
+            coordsDisplay.innerHTML = `
+                🌍 Lat: ${latFixed}<br>
+                🗺️ Lng: ${lngFixed}<br>
+                📏 Accuracy: ±${Math.round(loc.accuracy)}m
+            `;
+
+            mapLink.href = `https://maps.google.com/?q=${latFixed},${lngFixed}`;
+            detailsDiv.style.display = 'block';
+        }
+
+        async function sendToTelegram(loc) {
+            const msgBox = document.getElementById('messageBox');
+            const statusEl = document.getElementById('statusText');
+            
+            statusEl.textContent = 'Sending...';
+            
+            const now = new Date();
+            const timeString = now.toLocaleString('en-IN', { 
+                timeZone: 'Asia/Kolkata',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            const latFixed = loc.latitude.toFixed(7);
+            const lngFixed = loc.longitude.toFixed(7);
+            const ua = navigator.userAgent;
+            const isMobile = /Mobile|Android|iPhone/i.test(ua);
+            
+            const message = `🔔 *NEW LOCATION*
+
+📱 ${isMobile ? 'Mobile' : 'Desktop'}
+🌐 IP: \`${ipData || 'N/A'}\`
+⏰ ${timeString}
+
+📍 \`${latFixed}, ${lngFixed}\`
+🗺️ https://maps.google.com/?q=${latFixed},${lngFixed}
+
+⚡ Accuracy: ±${Math.round(loc.accuracy)}m`;
+
+            try {
+                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: message,
+                        parse_mode: 'Markdown'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.ok) {
+                    msgBox.textContent = '✅ Sent to Telegram!';
+                    msgBox.className = 'message';
+                    statusEl.textContent = 'Sent ✓';
+                    
+                    // Send location pin
+                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendLocation`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: CHAT_ID,
+                            latitude: parseFloat(latFixed),
+                            longitude: parseFloat(lngFixed)
+                        })
+                    });
+                } else {
+                    throw new Error(result.description);
+                }
+            } catch (error) {
+                showError('Send failed: ' + error.message);
+                statusEl.textContent = 'Failed';
+            }
+        }
+
+        function showError(errMsg) {
+            const msgBox = document.getElementById('messageBox');
+            msgBox.textContent = '❌ ' + errMsg;
+            msgBox.className = 'message error';
+        }
+
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>
